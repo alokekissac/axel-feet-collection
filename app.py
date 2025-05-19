@@ -16,7 +16,7 @@ def index():
     for filename in os.listdir(app.config['UPLOAD_FOLDER']):
         if filename.endswith(('.png', '.jpg', '.jpeg', '.gif')) and filename not in ['sonss.png', 'sunu.avif']:
             parts = filename.split('__', 1)
-            name = parts[0] if len(parts) == 2 else 'Anonymous'
+            name = parts[0] if len(parts) == 2 else filename.rsplit('.', 1)[0]
             images.append((filename, name))
     if request.method == 'POST':
         name = request.form['name']
