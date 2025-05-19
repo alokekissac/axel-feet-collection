@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Axel Feet Collection</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-image: url("sunu.avif");
+      background-size: cover;
+      background-position: center;
+      color: rgb(11, 207, 43);
+      text-align: center;
+    }
+
+    .header {
+      padding-top: 40px;
+    }
+
+    .header .title {
+      font-size: 80px;
+      font-weight: bold;
+      color: #66c18c;
+      line-height: 0.9;
+    }
+
+    .header .subtitle {
+      font-size: 40px;
+      letter-spacing: 2px;
+      color: white;
+    }
+
+    .left-art {
+      position: absolute;
+      top: 150px;
+      left: 40px;
+      width: 250px;
+    }
+
+    .left-art img {
+      width: 100%;
+      border-radius: 20px;
+    }
+
+    .upload-section {
+      margin-top: 20px;
+    }
+
+    .upload-section p {
+      font-size: 14px;
+      margin: 0;
+      font-weight: bold;
+    }
+
+    .upload-section form {
+      margin: 20px auto;
+    }
+
+    .upload-section input[type="text"],
+    .upload-section input[type="file"] {
+      margin: 10px;
+      padding: 10px;
+      font-size: 1em;
+    }
+
+    .upload-section button {
+      padding: 10px 30px;
+      font-size: 1em;
+      background-color: #6FA3A7;
+      border: none;
+      border-radius: 10px;
+      color: white;
+      cursor: pointer;
+    }
+
+    .gallery {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 15px;
+      padding: 20px;
+    }
+
+    .gallery-item {
+      background-color: rgba(115, 6, 216, 0.4);
+      padding: 10px;
+      border-radius: 10px;
+      width: 200px;
+    }
+
+    .gallery-item img {
+      width: 100%;
+      height: auto;
+      border-radius: 10px;
+    }
+
+    .gallery-item p {
+      margin-top: 10px;
+      color: #fff;
+    }
+
+    .footer {
+      text-align: center;
+      padding: 20px;
+      font-size: 0.9em;
+      color: #cccccc;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="left-art">
+    <img src="sonss.png" alt="Axel Art">
+  </div>
+
+  <div class="header">
+    <div class="title">Axel Feet</div>
+    <div class="subtitle">COLLECTION</div>
+  </div>
+
+  <div class="upload-section">
+    <p>IF ANYONE WISH TO ADD AXEL FEET PIC TO THIS COLLECTION<br>UPLOAD HERE</p>
+    <form method="POST" enctype="multipart/form-data">
+      <input type="text" name="name" placeholder="Your Name" required>
+      <input type="file" name="image" required><br>
+      <button type="submit">Upload</button>
+    </form>
+  </div>
+
+  <div class="gallery">
+    {% for filename, name in images %}
+    <div class="gallery-item">
+      <img src="{{ url_for('static', filename='uploads/' ~ filename) }}" alt="{{ name }}">
+      <p>{{ name }}</p>
+    </div>
+    {% endfor %}
+  </div>
+
+  <div class="footer">
+    CREATED BY ALOKE FOR AXEL AND ALLOCA
+  </div>
+
+</body>
+</html>
