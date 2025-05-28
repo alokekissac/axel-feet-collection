@@ -7,7 +7,7 @@
     body {
       margin: 0;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-image: url("{{ url_for('static', filename='uploads/sunu.avif') }}");
+      background-image: url("sunu.avif");
       background-size: cover;
       background-position: center;
       color: rgb(11, 207, 43);
@@ -111,7 +111,7 @@
 <body>
 
   <div class="left-art">
-    <img src="{{ url_for('static', filename='uploads/sonss.png') }}" alt="Axel Art">
+    <img src="sonss.png" alt="Axel Art">
   </div>
 
   <div class="header">
@@ -120,26 +120,82 @@
   </div>
 
   <div class="upload-section">
-    <p>IF ANYONE WISH TO ADD AXEL FEET PIC TO THIS COLLECTION<br>JUST UPLOAD HERE</p>
-    <form method="POST" enctype="multipart/form-data">
-      <input type="text" name="name" placeholder="Your Name" required>
-      <input type="file" name="image" required><br>
+    <p>IF ANYONE WISH TO ADD AXEL FEET PIC TO THIS COLLECTION<br>UPLOAD HERE</p>
+    <form id="upload-form">
+      <input type="text" name="name" id="name" placeholder="Your Name" required>
+      <input type="file" name="image" id="image" accept=".jpg,.jpeg,.png,.gif,.webp,.bmp" required><br>
       <button type="submit">Upload</button>
     </form>
+    <p id="status"></p>
   </div>
 
-  <div class="gallery">
-    {% for filename, name in images %}
-    <div class="gallery-item">
-      <img src="{{ url_for('static', filename='uploads/' ~ filename) }}" alt="{{ name }}">
-      <p>{{ name }}</p>
-    </div>
-    {% endfor %}
+  <div class="gallery" id="gallery">
+    <!-- Images will load here -->
   </div>
 
   <div class="footer">
-    CREATED BY ALOKE FOR AXEL AND ALLOCA FAMILY
+    CREATED BY ALOKE FOR AXEL AND ALLOCA
   </div>
+
+  <script>
+    const form = document.getElementById('upload-form');
+    const gallery = document.getElementById('gallery');
+    const statusText = document.getElementById('status');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const name = document.getElementById('name').value;
+      const file = document.getElementById('image').files[0];
+
+      if (!file || !name) return;
+
+      const formData = new FormData();
+      formData.append('name', name);
+      formData.append('image', file);
+
+      try {
+        statusText.textContent = "Uploading...";
+        const res = await fetch('https://axelsbirthday.xyz/api/upload-image', {
+          method: 'POST',
+          body: formData,
+        });
+
+        if (res.ok) {
+          statusText.textContent = "Upload successful!";
+          form.reset();
+          loadImages(); // refresh gallery
+        } else {
+          statusText.textContent = "Upload failed.";
+        }
+      } catch (err) {
+        statusText.textContent = "Error uploading image.";
+      }
+    });
+
+    async function loadImages() {
+      try {
+        const res = await fetch('https://axelsbirthday.xyz/api/images');
+        const images = await res.json();
+
+        gallery.innerHTML = '';
+        images.forEach(img => {
+          const div = document.createElement('div');
+          div.className = 'gallery-item';
+          div.innerHTML = `
+            <img src="${img.url}" alt="${img.name}">
+            <p>${img.name}</p>
+          `;
+          gallery.appendChild(div);
+        });
+      } catch (err) {
+        gallery.innerHTML = '<p>Error loading images.</p>';
+      }
+    }
+
+    // Load images on page load
+    window.onload = loadImages;
+  </script>
 
 </body>
 </html>
