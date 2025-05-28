@@ -1,35 +1,34 @@
-
-from flask import Flask, render_template, request, redirect, url_for
-import os
-from werkzeug.utils import secure_filename
+from flask import Flask, render_template, request, redirect, url_for, jsonify
+import requests
 
 app = Flask(__name__)
-UPLOAD_FOLDER = 'static/uploads'
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-if not os.path.exists(UPLOAD_FOLDER):
-    os.makedirs(UPLOAD_FOLDER)
-
-@app.route('/', methods=['GET', 'POST'])
+# Render your index.html
+@app.route('/', methods=['GET'])
 def index():
-    images = []
-    for filename in os.listdir(app.config['UPLOAD_FOLDER']):
-        if filename.endswith(('.png', '.jpg', '.jpeg', '.gif')) and filename not in ['sonss.png', 'sunu.avif']:
-            parts = filename.split('__', 1)
-            name = parts[0] if len(parts) == 2 else filename.rsplit('.', 1)[0]
-            images.append((filename, name))
-    if request.method == 'POST':
-        name = request.form['name']
-        file = request.files['image']
-        if file:
-            filename = secure_filename(f"{name}__{file.filename}")
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            return redirect(url_for('index'))
-    return render_template('index.html', images=images)
+    return render_template('index.html')
 
-import os
+# Proxy to fetch images from axelsbirthday.xyz
+@app.route('/proxy/images')
+def proxy_images():
+    try:
+        response = requests.get("https://axelsbirthday.xyz/api/images", verify=False)
+        response.raise_for_status()
+        return jsonify(response.json())
+    except requests.RequestException as e:
+        return jsonify({'error': 'Failed to fetch images'}), 500
+
+# Optional: Proxy for uploading too (to keep your API key/server secure if needed)
+@app.route('/proxy/upload', methods=['POST'])
+def proxy_upload():
+    try:
+        files = {'image': request.files['image']}
+        data = {'name': request.form['name']}
+        res = requests.post("https://axelsbirthday.xyz/api/upload-image", files=files, data=data, verify=False)
+        res.raise_for_status()
+        return redirect(url_for('index'))
+    except requests.RequestException:
+        return "Upload failed", 500
 
 if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host='0.0.0.0', port=port)
-
+    app.run(debug=True)
