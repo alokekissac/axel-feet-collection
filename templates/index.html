@@ -148,7 +148,10 @@
     const name = document.getElementById('name').value;
     const file = document.getElementById('image').files[0];
 
-    if (!file || !name) return;
+    if (!file || !name) {
+      statusText.textContent = "Name and image are required.";
+      return;
+    }
 
     const formData = new FormData();
     formData.append('name', name);
@@ -156,19 +159,26 @@
 
     try {
       statusText.textContent = "Uploading...";
+      console.log("Submitting upload with name:", name, "and file:", file.name);
+
       const res = await fetch('/proxy/upload', {
         method: 'POST',
         body: formData,
       });
+
+      const text = await res.text();  // get response content (if any)
+      console.log("Upload response status:", res.status);
+      console.log("Upload response body:", text);
 
       if (res.ok) {
         statusText.textContent = "Upload successful!";
         form.reset();
         loadImages();
       } else {
-        statusText.textContent = "Upload failed.";
+        statusText.textContent = "Upload failed: " + text;
       }
     } catch (err) {
+      console.error("Upload error:", err);
       statusText.textContent = "Error uploading image.";
     }
   });
@@ -189,12 +199,14 @@
         gallery.appendChild(div);
       });
     } catch (err) {
+      console.error("Failed to load images:", err);
       gallery.innerHTML = '<p>Error loading images.</p>';
     }
   }
 
   window.onload = loadImages;
 </script>
+
 
 </body>
 </html>
