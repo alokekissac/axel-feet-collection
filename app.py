@@ -26,10 +26,16 @@ def proxy_upload():
         print("Upload request received")
 
         # Retrieve the uploaded image and name
-        files = {'image': request.files['image']}
-        data = {'name': request.form['name']}
+        image = request.files['image']
+        name = request.form['name']
 
-        print(f"Uploading: {data['name']}, File: {files['image'].filename}")
+        print(f"Uploading: {name}, File: {image.filename}, Type: {image.content_type}")
+
+        # Set correct content type so multer (on external API) recognizes it as an image
+        files = {
+            'image': (image.filename, image.stream, image.content_type)
+        }
+        data = {'name': name}
 
         # Send the request to the external API
         res = requests.post(
@@ -44,7 +50,6 @@ def proxy_upload():
         return jsonify({'message': 'Upload successful'}), 200
 
     except requests.RequestException as e:
-        # Print the actual error response content if available
         if e.response is not None:
             print("Upload error (response):", e.response.text)
         else:
