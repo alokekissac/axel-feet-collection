@@ -14,7 +14,15 @@ def proxy_images():
     try:
         response = requests.get("https://axelsbirthday.xyz/api/images", verify=False)
         response.raise_for_status()
-        return jsonify(response.json())
+        data = response.json()
+        print("Images response from API:", data)
+
+        # If the response is a dict with an 'images' list inside, return only the list
+        if isinstance(data, dict) and "images" in data:
+            return jsonify(data["images"])
+
+        # If the response is already a list
+        return jsonify(data)
     except requests.RequestException as e:
         print("Image fetch error:", e)
         return jsonify({'error': 'Failed to fetch images'}), 500
@@ -26,16 +34,10 @@ def proxy_upload():
         print("Upload request received")
 
         # Retrieve the uploaded image and name
-        image = request.files['image']
-        name = request.form['name']
+        files = {'image': request.files['image']}
+        data = {'name': request.form['name']}
 
-        print(f"Uploading: {name}, File: {image.filename}, Type: {image.content_type}")
-
-        # Set correct content type so multer (on external API) recognizes it as an image
-        files = {
-            'image': (image.filename, image.stream, image.content_type)
-        }
-        data = {'name': name}
+        print(f"Uploading: {data['name']}, File: {files['image'].filename}")
 
         # Send the request to the external API
         res = requests.post(
@@ -50,6 +52,7 @@ def proxy_upload():
         return jsonify({'message': 'Upload successful'}), 200
 
     except requests.RequestException as e:
+        # Print the actual error response content if available
         if e.response is not None:
             print("Upload error (response):", e.response.text)
         else:
