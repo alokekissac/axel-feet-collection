@@ -7,7 +7,7 @@
     body {
       margin: 0;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-image: url("sunu.avif");
+      background-image: url("{{ url_for('static', filename='sunu.avif') }}");
       background-size: cover;
       background-position: center;
       color: rgb(11, 207, 43);
@@ -111,7 +111,7 @@
 <body>
 
   <div class="left-art">
-    <img src="/templates/sonss.png" alt="Axel Art">
+    <img src="{{ url_for('static', filename='sonss.png') }}" alt="Axel Art">
   </div>
 
   <div class="header">
