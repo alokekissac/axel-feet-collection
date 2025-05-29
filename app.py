@@ -44,7 +44,11 @@ def proxy_upload():
         return jsonify({'message': 'Upload successful'}), 200
 
     except requests.RequestException as e:
-        print("Upload error:", e)
+        # Print the actual error response content if available
+        if e.response is not None:
+            print("Upload error (response):", e.response.text)
+        else:
+            print("Upload error (exception):", str(e))
         return jsonify({'error': 'Upload failed'}), 500
 
 if __name__ == '__main__':
